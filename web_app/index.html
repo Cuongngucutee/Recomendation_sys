@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olist 360 Analytics & Shop</title>
+    <!-- Thư viện CSS/JS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <!-- NAVIGATION -->
+    <nav class="bg-gray-900 text-white sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-chart-line text-yellow-400 text-2xl"></i>
+                <span class="text-xl font-bold tracking-wide">Olist 360 Insights</span>
+            </div>
+            <div class="flex gap-6 text-sm font-medium">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn text-yellow-400 border-b-2 border-yellow-400 pb-1">
+                    <i class="fa-solid fa-gauge mr-1"></i> Dashboard Quản Trị
+                </button>
+                <button onclick="switchTab('shop')" id="btn-shop" class="nav-btn text-gray-400 hover:text-white pb-1 transition">
+                    <i class="fa-solid fa-store mr-1"></i> Demo Mua Sắm
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto px-6 py-8">
+
+        <!-- TAB 1: DASHBOARD (INSIGHTS) -->
+        <div id="tab-dashboard" class="tab-content">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Tổng Quan Thị Trường</h2>
+                <p class="text-gray-500">Phân tích xu hướng doanh thu và chân dung khách hàng từ dữ liệu Olist.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chart 1: Revenue Trend -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-700">📈 Xu Hướng Doanh Thu (Seasonal Analysis)</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Black Friday Highlight</span>
+                    </div>
+                    <div class="relative h-72">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Customer Segments -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="font-bold text-gray-700 mb-4">👥 Phân Khúc Khách Hàng (RFM)</h3>
+                    <div class="relative h-64 flex justify-center">
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500 text-center">
+                        *Dựa trên thuật toán K-Means Clustering
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SHOPPING SIMULATION -->
+        <div id="tab-shop" class="tab-content hidden">
+            <div class="flex flex-col lg:flex-row gap-6">
+                
+                <!-- PRODUCT LIST (Left) -->
+                <div class="w-full lg:w-3/4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Sản Phẩm Đề Xuất</h2>
+                        <div class="text-sm text-gray-500 bg-white px-3 py-1 rounded shadow-sm">
+                            <i class="fa-solid fa-filter mr-1"></i> Lọc theo: Tất cả
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="product-grid">
+                        <!-- JS sẽ render sản phẩm ở đây -->
+                    </div>
+                </div>
+
+                <!-- CART & RECOMMENDATIONS (Right - Sticky) -->
+                <div class="w-full lg:w-1/4">
+                    <div class="sticky top-20 space-y-4">
+                        
+                        <!-- Cart Panel -->
+                        <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
+                            <div class="flex justify-between items-center border-b pb-2 mb-3">
+                                <h3 class="font-bold text-gray-700"><i class="fa-solid fa-cart-shopping mr-2 text-yellow-500"></i>Giỏ Hàng</h3>
+                                <span id="cart-count" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                            </div>
+                            
+                            <div id="cart-items" class="space-y-3 max-h-60 overflow-y-auto pr-1 empty-cart">
+                                <div class="text-center py-6 text-gray-400 text-sm">
+                                    <i class="fa-solid fa-basket-shopping text-3xl mb-2 opacity-50"></i><br>
+                                    Giỏ hàng trống
+                                </div>
+                            </div>
+
+                            <div class="border-t mt-3 pt-3">
+                                <div class="flex justify-between font-bold text-gray-800 mb-3">
+                                    <span>Tổng cộng:</span>
+                                    <span id="cart-total" class="text-red-500">0₫</span>
+                                </div>
+                                <button onclick="checkout()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded transition shadow-md">
+                                    Thanh Toán
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations Panel (AI Powered) -->
+                        <div id="ai-panel" class="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-lg shadow border border-indigo-100 hidden transition-all duration-500">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="bg-indigo-600 text-white p-1 rounded">
+                                    <i class="fa-solid fa-robot"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-indigo-900 text-sm">Gợi ý Thông minh</h3>
+                                    <p class="text-[10px] text-indigo-500">Powered by FP-Growth</p>
+                                </div>
+                            </div>
+                            
+                            <div id="recommendation-list" class="space-y-2">
+                                <!-- JS render gợi ý -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- IMPORT DỮ LIỆU & LOGIC -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

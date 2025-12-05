@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Service 1: Chạy Data Pipeline (Xử lý dữ liệu & Sinh model)
+  pipeline:
+    build: .
+    container_name: olist_pipeline
+    volumes:
+      # Mount thư mục hiện tại vào /app trong container để code thay đổi thì chạy lại được ngay
+      - .:/app
+    # Lệnh chạy pipeline. Sau khi chạy xong container sẽ tự tắt.
+    command: python main_pipeline.py
+    # Không tự khởi động lại khi chạy xong (để tránh chạy đi chạy lại pipeline tốn resource)
+    restart: "no"
+
+  # Service 2: Web Server (Hiển thị giao diện Demo)
+  web:
+    image: python:3.9-slim
+    container_name: olist_web_demo
+    working_dir: /app/web_app
+    volumes:
+      # Mount thư mục dự án để web server đọc được file data.js vừa sinh ra
+      - .:/app
+    ports:
+      - "8000:8000"
+    # Dùng module http.server của Python để tạo web server đơn giản
+    command: python -m http.server 8000 --bind 0.0.0.0
+    # Service web sẽ phụ thuộc vào pipeline (tuy nhiên web sẽ start ngay mà ko đợi pipeline xong)
+    depends_on:
+      - pipeline
+    restart: always
+
+# Mạng nội bộ (Optional, docker tự tạo default network)
+networks:
+  default:
+    driver: bridge
