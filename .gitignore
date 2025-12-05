@@ -4,17 +4,6 @@ __pycache__/
 *.pyo
 *.pyd
 
-# 2. Dữ liệu (Không push file nặng lên Git)
-# Chỉ giữ lại cấu trúc thư mục, bỏ qua file bên trong
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
-
-# 3. Kết quả đầu ra (Generated Outputs)
-# Vì những file này do Docker tự sinh ra mỗi lần chạy
-outputs/*
-web_app/data.js
 
 # 4. Môi trường ảo (Virtual Env) & Cấu hình IDE
 env/
